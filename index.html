@@ -1,481 +1,403 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hydra Corp - Global Dashboard</title>
+    <title>PDG Company | Elite Gaming</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --hydra-cyan: #00e5ff;
-            --hydra-purple: #9d4edd;
-            --hydra-bg: #030712;
-            --hydra-card-bg: #0a0f1d;
-            --hydra-border: #1e293b;
-        }
-
         body {
-            background-color: var(--hydra-bg);
-            color: #ffffff;
             font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
+            background-color: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
         }
 
-        .font-brand { font-family: 'Outfit', sans-serif; }
-
-        .sidebar {
-            background: #010409;
-            border-right: 1px solid var(--hydra-border);
+        .red-gradient {
+            background: linear-gradient(135deg, #ff0000 0%, #a30000 100%);
         }
 
-        .sidebar-logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            object-fit: cover;
-            border: 1px solid rgba(0, 229, 255, 0.3);
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+        .glass-card {
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: #ff0000;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(255, 0, 0, 0.2);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
         }
 
         .nav-link {
-            color: #64748b;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            transition: all 0.2s;
-            border-radius: 12px;
-            margin-bottom: 4px;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: var(--hydra-cyan);
-            background: rgba(0, 229, 255, 0.05);
-            border: 1px solid rgba(0, 229, 255, 0.2);
-        }
-
-        .card-global {
-            background: var(--hydra-card-bg);
-            border-radius: 24px;
-            border: 1px solid #1e293b;
-            overflow: hidden;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .card-global:hover {
-            transform: translateY(-5px);
-            border-color: var(--hydra-cyan);
-        }
-
-        .card-image-container {
             position: relative;
-            height: 200px;
-            background: #111827;
+            transition: color 0.3s ease;
         }
 
-        .card-image {
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #ff0000;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #ff0000; border-radius: 4px; }
+
+        .text-outline {
+            -webkit-text-stroke: 1.5px #ff0000;
+        }
+
+        .carousel-container {
+            position: relative;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            opacity: 0.9;
+            overflow: hidden;
         }
-
-        .lvl-badge {
+        .carousel-item {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--hydra-cyan);
-            color: #000;
-            font-size: 10px;
-            font-weight: 900;
-            padding: 5px 12px;
-            border-radius: 30px;
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            background-size: cover;
+            background-position: center;
         }
-
-        .class-badge {
+        .carousel-item.active {
+            opacity: 0.65;
+        }
+        .carousel-overlay {
             position: absolute;
-            bottom: -12px;
-            left: 20px;
-            background: var(--hydra-purple);
-            color: #fff;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 5px 15px;
-            border-radius: 6px;
-            text-transform: uppercase;
-            z-index: 10;
-            box-shadow: 0 4px 10px rgba(157, 78, 221, 0.3);
+            inset: 0;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.95) 0%, 
+                rgba(0,0,0,0.2) 50%, 
+                rgba(0,0,0,1) 100%);
         }
 
-        .btn-register {
-            background: #0ea5e9;
-            color: #000;
-            font-weight: 800;
+        .tag-badge {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            padding: 4px 12px;
+            border-radius: 4px;
             font-size: 0.75rem;
-            text-transform: uppercase;
-            padding: 12px 24px;
-            border-radius: 30px;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+        }
+
+        #joinModal {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #joinModal.active {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
+            opacity: 1;
         }
 
-        .input-global {
-            background: #0f172a !important;
-            border: 1px solid #1e293b !important;
-            color: #fff;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 0.85rem;
+        .input-pdg {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            width: 100%;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .input-pdg:focus {
+            border-color: #ff0000;
         }
 
-        .modal-bg {
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(12px);
+        /* Feedback Styles */
+        #formFeedback {
+            display: none;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
         }
-
-        .section-content { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
     </style>
 </head>
-<body class="flex min-h-screen">
+<body class="selection:bg-red-600 selection:text-white">
 
-    <!-- Sidebar Lateral -->
-    <aside class="sidebar w-72 fixed h-full flex flex-col p-8 z-50">
-        <div class="mb-14 flex items-center gap-4">
-            <img src="https://i.imgur.com/SaDLhFw.jpeg" alt="Hydra Logo" class="sidebar-logo">
-            <div>
-                <h1 class="font-brand text-lg font-extrabold tracking-tighter uppercase leading-none">Hydra</h1>
-                <span class="text-[10px] text-cyan-500 font-black tracking-[0.2em] uppercase">Corporation</span>
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 px-8 py-5 flex justify-between items-center bg-black/95 backdrop-blur-xl border-b border-red-900/40">
+        <div class="text-2xl font-black tracking-tighter italic">
+            PDG<span class="text-red-600">COMPANY</span>
+        </div>
+        <div class="hidden md:flex gap-10 text-xs font-bold tracking-[0.2em] uppercase items-center">
+            <a href="#inicio" class="nav-link">Início</a>
+            <a href="#lideranca" class="nav-link">Liderança</a>
+            <a href="#conquistas" class="nav-link">História</a>
+            <a href="#" class="nav-link">Clãs</a>
+            <button onclick="toggleModal()" class="text-red-500 hover:text-red-400 transition-colors uppercase tracking-widest font-black">Join Us</button>
+        </div>
+        <button class="md:hidden text-white" id="menuBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="min-h-screen flex flex-col justify-center items-center relative text-center overflow-hidden">
+        <div class="absolute inset-0 z-0 bg-black">
+            <div class="carousel-container" id="heroCarousel">
+                <div class="carousel-item active" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80');"></div>
+                <div class="carousel-item" style="background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80');"></div>
+                <div class="carousel-item" style="background-image: url('https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&q=80');"></div>
+                <div class="carousel-overlay"></div>
             </div>
         </div>
 
-        <nav class="flex-1 space-y-1">
-            <button onclick="showSection('showcase')" class="nav-link active w-full text-left p-4 flex items-center gap-4">
-                <span class="text-lg">👤</span> VITRINE GLOBAL
-            </button>
-            <button onclick="showSection('service-xp')" class="nav-link w-full text-left p-4 flex items-center gap-4">
-                <span class="text-lg">📈</span> PAINEL XP
-            </button>
-            <button onclick="showSection('service-quest')" class="nav-link w-full text-left p-4 flex items-center gap-4">
-                <span class="text-lg">⚔️</span> QUEST LOG
-            </button>
-            <button onclick="showSection('drops')" class="nav-link w-full text-left p-4 flex items-center gap-4">
-                <span class="text-lg">💰</span> CALCULADORA
-            </button>
-        </nav>
-
-        <div class="mt-auto pt-6">
-            <div class="p-5 bg-slate-900/50 rounded-2xl border border-slate-800">
-                <p class="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-2">Cloud Status</p>
-                <div class="flex items-center gap-2">
-                    <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-slate-700"></span>
-                    <span id="syncStatusText" class="text-[10px] font-bold text-slate-500 italic">CONNECTING...</span>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <main class="ml-72 flex-1 p-16">
-        <section id="showcase" class="section-content">
-            <div class="flex justify-between items-end mb-12">
-                <div>
-                    <h2 class="font-brand text-4xl font-black italic uppercase tracking-tighter text-white mb-2">VITRINE GLOBAL</h2>
-                    <div class="flex items-center gap-3">
-                        <span class="h-[2px] w-12 bg-cyan-500"></span>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Base de dados sincronizada</p>
-                    </div>
-                </div>
-                <button onclick="openModal('registerModal')" class="btn-register">
-                    <span class="text-xl">+</span> NOVO REGISTRO
+        <div class="z-10 animate-fade px-4">
+            <h2 class="text-xs md:text-sm tracking-[0.6em] uppercase text-red-600 font-black mb-6 text-glow">Bem-vinda à PDG Company</h2>
+            <h1 class="text-7xl md:text-[10rem] font-black tracking-tighter leading-none mb-8 italic uppercase text-white">
+                DOMÍNIO<br><span class="text-outline text-transparent">ABSOLUTO</span>
+            </h1>
+            <p class="max-w-2xl mx-auto text-white text-base md:text-lg mb-12 leading-relaxed font-medium drop-shadow-2xl">
+                Elevamos o padrão do gaming competitivo. Estrutura sólida, táticas agressivas e execução de elite.
+            </p>
+            <div class="flex flex-col md:flex-row gap-6 justify-center">
+                <button onclick="toggleModal()" class="red-gradient px-12 py-5 text-sm font-black uppercase tracking-widest rounded-sm hover:scale-105 transition-all shadow-xl shadow-red-900/30">
+                    Candidata-te Agora
                 </button>
+                <a href="#lideranca" class="bg-white px-12 py-5 text-sm font-black uppercase tracking-widest rounded-sm text-black hover:bg-red-600 hover:text-white transition-all">
+                    Ver Líder
+                </a>
             </div>
-            <div id="membersList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
-        </section>
+        </div>
 
-        <section id="service-xp" class="section-content hidden">
-            <h2 class="font-brand text-4xl font-black italic uppercase text-white mb-12">PAINEL XP</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="xpMemberGrid"></div>
-        </section>
+        <div class="absolute bottom-24 flex gap-3 z-20">
+            <div class="w-10 h-1.5 bg-red-600 rounded-full cursor-pointer transition-all" onclick="setSlide(0)"></div>
+            <div class="w-10 h-1.5 bg-white/30 rounded-full cursor-pointer transition-all" onclick="setSlide(1)"></div>
+            <div class="w-10 h-1.5 bg-white/30 rounded-full cursor-pointer transition-all" onclick="setSlide(2)"></div>
+        </div>
+    </section>
 
-        <section id="service-quest" class="section-content hidden">
-            <h2 class="font-brand text-4xl font-black italic uppercase text-white mb-12">QUEST LOG</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="questMemberGrid"></div>
-        </section>
+    <!-- Leadership Section -->
+    <section id="lideranca" class="py-32 px-8 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+            <div>
+                <span class="text-red-600 font-black tracking-widest uppercase text-xs italic">O Comando</span>
+                <h3 class="text-6xl font-black uppercase tracking-tighter mt-2 italic text-white">Liderança</h3>
+            </div>
+            <p class="text-gray-400 max-w-sm text-sm font-medium border-l-2 border-red-600 pl-4">A força estratégica por trás da Company.</p>
+        </div>
 
-        <section id="drops" class="section-content hidden">
-            <div class="max-w-xl mx-auto p-12 bg-slate-900/80 backdrop-blur border border-slate-800 rounded-[40px]">
-                <h2 class="font-brand text-3xl font-black italic uppercase text-center mb-12">Cálculo de Dividendos</h2>
-                <div class="space-y-6">
-                    <input type="text" id="dropName" class="input-global w-full" placeholder="NOME DO ITEM / DROP">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="number" id="dropValue" class="input-global" placeholder="VALOR TOTAL">
-                        <input type="number" id="dropPeople" class="input-global" placeholder="MEMBROS">
-                    </div>
-                    <button onclick="calculateDrop()" class="w-full btn-register py-5 justify-center">Executar Partilha</button>
-                    <div id="dropResult" class="hidden text-center pt-10 border-t border-slate-800 mt-6">
-                        <p class="text-[10px] text-cyan-500 font-black uppercase tracking-widest mb-3">Quota Individual</p>
-                        <p id="resultValue" class="text-5xl font-brand font-black">R$ 0.00</p>
-                    </div>
+        <div class="flex justify-center">
+            <div class="glass-card p-10 group relative overflow-hidden w-full max-w-lg text-center">
+                <div class="mb-8 relative inline-block">
+                    <div class="absolute inset-0 bg-red-600 rounded-full blur-md opacity-20 group-hover:opacity-50 transition-opacity"></div>
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80" alt="Pardal" class="w-48 h-48 rounded-full border-4 border-red-600 object-cover relative z-10 grayscale hover:grayscale-0 transition-all duration-500 mx-auto">
+                </div>
+                
+                <div class="w-24 h-2 bg-red-600 mx-auto mb-8"></div>
+                <h4 class="text-6xl font-black mb-2 group-hover:text-red-500 transition-colors italic uppercase tracking-tighter text-white">Pardal</h4>
+                <p class="text-sm uppercase tracking-[0.5em] text-red-500 font-bold mb-10">Founder & CEO</p>
+                
+                <div class="flex gap-8 justify-center items-center">
+                    <a href="https://www.youtube.com/@PardalGaming" target="_blank" class="text-gray-400 hover:text-[#FF0000] transition-all transform hover:scale-125">
+                        <i class="fa-brands fa-youtube text-4xl"></i>
+                    </a>
+                    <a href="https://discord.gg/X7hCQ7hREM" target="_blank" class="text-gray-400 hover:text-[#5865F2] transition-all transform hover:scale-125">
+                        <i class="fa-brands fa-discord text-4xl"></i>
+                    </a>
+                    <a href="https://www.twitch.tv/pardalgamingtv" target="_blank" class="text-gray-400 hover:text-[#9146FF] transition-all transform hover:scale-125">
+                        <i class="fa-brands fa-twitch text-4xl"></i>
+                    </a>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <div id="registerModal" class="modal-bg fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
-        <div class="w-full max-w-lg bg-[#0a0f1d] border border-slate-800 p-12 rounded-[40px] shadow-2xl">
-            <h3 class="font-brand text-2xl font-black uppercase text-cyan-400 mb-10">Cadastrar Novo Membro</h3>
-            <form id="regForm" class="space-y-5">
-                <input type="text" id="regNick" placeholder="NICKNAME IN-GAME" class="input-global w-full" required>
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="regLevel" placeholder="LEVEL ATUAL" class="input-global" required>
-                    <input type="text" id="regClass" placeholder="CLASSE" class="input-global" required>
+    <!-- Modal de Recrutamento -->
+    <div id="joinModal" class="fixed inset-0 z-[100] items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+        <div class="glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 md:p-12 relative animate-fade">
+            <button onclick="toggleModal()" class="absolute top-6 right-6 text-white/50 hover:text-red-600 transition-colors">
+                <i class="fa-solid fa-xmark text-3xl"></i>
+            </button>
+
+            <div class="text-center mb-10">
+                <h3 class="text-4xl font-black uppercase italic text-glow">Protocolo Elite</h3>
+                <p class="text-red-600 text-[10px] tracking-[0.4em] uppercase font-black mt-2">Apenas os melhores são aceites</p>
+            </div>
+
+            <form id="recruitmentForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Nick / Game ID</label>
+                        <input type="text" name="nick" required class="input-pdg" placeholder="Ex: Pardal">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Classe</label>
+                        <input type="text" name="classe" required class="input-pdg" placeholder="Ex: Assassino">
+                    </div>
                 </div>
-                <input type="text" id="regName" placeholder="NOME DO OPERADOR" class="input-global w-full" required>
-                <input type="text" id="regWhatsapp" placeholder="WHATSAPP (EX: 819...)" class="input-global w-full" required>
-                <div class="pt-4">
-                    <label class="text-[10px] font-black text-slate-500 uppercase mb-2 block ml-1">Avatar de Perfil (URL ou Vazio para padrão)</label>
-                    <input type="text" id="regPhotoUrl" class="input-global w-full" placeholder="https://...">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Nível</label>
+                        <input type="number" name="nivel" required class="input-pdg" placeholder="99">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Nome Real</label>
+                        <input type="text" name="nome_real" required class="input-pdg" placeholder="Teu Nome">
+                    </div>
                 </div>
-                <div class="flex gap-6 pt-10">
-                    <button type="button" onclick="closeModal('registerModal')" class="flex-1 text-[11px] font-black uppercase text-slate-500 hover:text-white transition">Cancelar</button>
-                    <button type="submit" class="flex-1 btn-register py-4 justify-center">Confirmar</button>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Idade</label>
+                        <input type="number" name="idade" required class="input-pdg" placeholder="18">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Número do WhatsApp</label>
+                        <input type="tel" name="whatsapp" required class="input-pdg" placeholder="+351 000 000 000">
+                    </div>
                 </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Discord</label>
+                    <input type="text" name="discord" required class="input-pdg" placeholder="username#0000">
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full red-gradient py-6 font-black uppercase tracking-[0.4em] text-lg hover:brightness-125 transition-all shadow-lg shadow-red-900/40">
+                    Enviar Candidatura
+                </button>
+
+                <div id="formFeedback"></div>
             </form>
         </div>
     </div>
 
-    <div id="logsModal" class="modal-bg fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
-        <div class="w-full max-w-2xl bg-[#0a0f1d] border border-slate-800 h-[85vh] flex flex-col p-12 rounded-[50px] shadow-2xl">
-            <h3 id="logsTitle" class="font-brand text-3xl font-black uppercase text-cyan-400 mb-10">Histórico</h3>
-            <div id="logsContent" class="flex-1 overflow-y-auto space-y-8 pr-6 custom-scroll"></div>
-            <button onclick="closeModal('logsModal')" class="mt-10 text-[11px] font-black uppercase text-slate-600 hover:text-white transition text-center">Fechar Histórico</button>
-        </div>
-    </div>
+    <!-- Footer -->
+    <footer class="py-16 border-t border-red-900/30 px-8 text-center bg-black">
+        <div class="text-xl font-black text-white italic mb-6">PDG<span class="text-red-600">COMPANY</span></div>
+        <div class="mt-8 text-gray-700 text-[9px]">© 2026 PDG COMPANY - TODOS OS DIREITOS RESERVADOS.</div>
+    </footer>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    <script>
+        // --- CONFIGURAÇÃO SUPABASE ATUALIZADA ---
+        const SUPABASE_URL = 'https://wydtvzuyknwliskbklgq.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_yTWogZAxVhhUVNPZ8q0cKA_vpZrSJO1';
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'hydra-corp-v1';
-
-        let members = [];
-        const hydraLogo = "https://i.imgur.com/G3P2JpT.jpeg";
-
-        // Auth Listener - Garante que as queries só ocorram APÓS o login
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('syncStatusDot').className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-                document.getElementById('syncStatusText').innerText = "LIVE SYNC ACTIVE";
-                document.getElementById('syncStatusText').className = "text-[10px] font-bold text-emerald-500";
-                startListening();
+        // Modal Logic
+        function toggleModal() {
+            const modal = document.getElementById('joinModal');
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
             } else {
-                initAuth();
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Carousel Logic
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-item');
+        const indicators = document.querySelectorAll('.bottom-24 div');
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(ind => {
+                ind.classList.remove('bg-red-600');
+                ind.classList.add('bg-white/30');
+                ind.style.width = "40px";
+            });
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            indicators[currentSlide].classList.add('bg-red-600');
+            indicators[currentSlide].classList.remove('bg-white/30');
+            indicators[currentSlide].style.width = "60px";
+        }
+        function setSlide(n) { showSlide(n); }
+        function nextSlide() { showSlide(currentSlide + 1); }
+        setInterval(nextSlide, 5000);
+
+        // --- SUBMISSÃO PARA O SUPABASE ---
+        document.getElementById('recruitmentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const feedback = document.getElementById('formFeedback');
+            const formData = new FormData(this);
+            
+            const userData = {
+                nick: formData.get('nick'),
+                classe: formData.get('classe'),
+                nivel: parseInt(formData.get('nivel')),
+                nome_real: formData.get('nome_real'),
+                idade: parseInt(formData.get('idade')),
+                whatsapp: formData.get('whatsapp'),
+                discord: formData.get('discord'),
+                created_at: new Date()
+            };
+
+            // Estilo de carregamento
+            btn.innerText = "PROCESSANDO DADOS...";
+            btn.disabled = true;
+            feedback.style.display = "none";
+
+            try {
+                const { data, error } = await _supabase
+                    .from('recrutamento')
+                    .insert([userData]);
+
+                if (error) throw error;
+
+                // Sucesso
+                feedback.style.display = "block";
+                feedback.style.color = "#00ff00";
+                feedback.innerText = "CANDIDATURA ENVIADA COM SUCESSO!";
+                
+                setTimeout(() => {
+                    this.reset();
+                    toggleModal();
+                    feedback.style.display = "none";
+                }, 3000);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                feedback.style.display = "block";
+                feedback.style.color = "#ff0000";
+                feedback.innerText = "ERRO: VERIFIQUE SE A TABELA 'RECRUTAMENTO' EXISTE.";
+            } finally {
+                btn.innerText = "Enviar Candidatura";
+                btn.disabled = false;
             }
         });
-
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth error:", error);
-            }
-        }
-
-        function startListening() {
-            if (!auth.currentUser) return;
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'members'));
-            onSnapshot(q, (snapshot) => {
-                members = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderUI();
-            }, (error) => {
-                console.error("Snapshot error:", error);
-                document.getElementById('syncStatusText').innerText = "PERMISSION DENIED";
-                document.getElementById('syncStatusDot').className = "w-2 h-2 rounded-full bg-red-500";
-            });
-        }
-
-        window.saveMember = async (memberData) => {
-            if (!auth.currentUser) return;
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'members'), {
-                    ...memberData,
-                    logs: [],
-                    quests: { AB1: false, AB2: false, AB3: false, CF: false },
-                    activePot: null,
-                    createdAt: serverTimestamp()
-                });
-            } catch (e) { console.error("Error adding member: ", e); }
-        };
-
-        window.updateMember = async (id, data) => {
-            if (!auth.currentUser) return;
-            const memberRef = doc(db, 'artifacts', appId, 'public', 'data', 'members', id);
-            await updateDoc(memberRef, data);
-        };
-
-        window.showSection = (id) => {
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.remove('hidden');
-            const btn = Array.from(document.querySelectorAll('.nav-link')).find(b => b.innerText.includes(id.toUpperCase().replace('-', ' ')));
-            if(btn) btn.classList.add('active');
-            renderUI();
-        };
-
-        window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
-        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
-
-        document.getElementById('regForm').onsubmit = async function(e) {
-            e.preventDefault();
-            const photoUrl = document.getElementById('regPhotoUrl').value || hydraLogo;
-
-            await saveMember({
-                nick: document.getElementById('regNick').value.toUpperCase(),
-                level: document.getElementById('regLevel').value,
-                classe: document.getElementById('regClass').value.toUpperCase(),
-                nomeReal: document.getElementById('regName').value.toUpperCase(),
-                whatsapp: document.getElementById('regWhatsapp').value,
-                photo: photoUrl
-            });
-
-            this.reset();
-            closeModal('registerModal');
-        };
-
-        window.startPot = async (memberId) => {
-            const start = document.getElementById(`start_${memberId}`).value;
-            const end = document.getElementById(`end_${memberId}`).value;
-            if (!start || !end) return;
-            const member = members.find(m => m.id === memberId);
-            const newLogs = [{ time: new Date().toLocaleTimeString(), message: `Serviço iniciado: ${start} - ${end}` }, ...(member.logs || [])];
-            await updateMember(memberId, { activePot: { start, end }, logs: newLogs });
-        };
-
-        window.finishPot = async (memberId) => {
-            const member = members.find(m => m.id === memberId);
-            const newLogs = [{ time: new Date().toLocaleTimeString(), message: `Serviço finalizado com sucesso.` }, ...(member.logs || [])];
-            await updateMember(memberId, { activePot: null, logs: newLogs });
-        };
-
-        window.completeQuest = async (memberId, questKey) => {
-            const member = members.find(m => m.id === memberId);
-            const updatedQuests = { ...(member.quests || {}), [questKey]: true };
-            const newLogs = [{ time: new Date().toLocaleTimeString(), message: `Quest ${questKey} concluída.` }, ...(member.logs || [])];
-            await updateMember(memberId, { quests: updatedQuests, logs: newLogs });
-        };
-
-        window.viewLogs = (memberId) => {
-            const member = members.find(m => m.id === memberId);
-            document.getElementById('logsTitle').innerText = member.nick;
-            const content = document.getElementById('logsContent');
-            content.innerHTML = (!member.logs || member.logs.length === 0) ? 
-                `<div class="h-full flex items-center justify-center text-slate-800 font-black text-xs uppercase tracking-widest">REGISTRO VAZIO</div>` :
-                member.logs.map(l => `
-                    <div class="pb-10 border-b border-slate-800/50 last:border-0">
-                        <span class="text-[10px] font-black text-cyan-500 uppercase tracking-widest">${l.time}</span>
-                        <p class="text-sm text-slate-400 font-medium leading-relaxed mt-2">${l.message}</p>
-                    </div>
-                `).join('');
-            openModal('logsModal');
-        };
-
-        window.calculateDrop = () => {
-            const val = parseFloat(document.getElementById('dropValue').value);
-            const people = parseInt(document.getElementById('dropPeople').value);
-            if (!val || !people) return;
-            const res = (val / people).toFixed(2);
-            document.getElementById('resultValue').innerText = `R$ ${res}`;
-            document.getElementById('dropResult').classList.remove('hidden');
-        };
-
-        function renderUI() {
-            const list = document.getElementById('membersList');
-            if (!list) return;
-            list.innerHTML = members.map(m => `
-                <div class="card-global">
-                    <div class="card-image-container">
-                        <img src="${m.photo}" class="card-image" onerror="this.src='${hydraLogo}'" />
-                        <div class="lvl-badge">LVL ${m.level}</div>
-                        <div class="class-badge">${m.classe}</div>
-                    </div>
-                    <div class="card-content p-8 pt-10">
-                        <h4 class="font-brand text-xl font-bold uppercase mb-1 tracking-tight">${m.nick}</h4>
-                        <p class="text-[10px] text-cyan-500/60 font-black uppercase tracking-widest mb-8">${m.nomeReal}</p>
-                        <div class="flex items-center justify-between pt-6 border-t border-slate-800/80">
-                            <button onclick="window.open('https://wa.me/${m.whatsapp}')" class="bg-slate-800/50 text-[10px] px-4 py-2 rounded-lg font-bold text-slate-300 hover:bg-cyan-500 hover:text-black transition">${m.whatsapp}</button>
-                        </div>
-                        <button onclick="viewLogs('${m.id}')" class="mt-6 w-full text-[9px] font-black uppercase text-slate-700 hover:text-white transition tracking-widest">Aceder Timeline —></button>
-                    </div>
-                </div>
-            `).join('');
-
-            const xpGrid = document.getElementById('xpMemberGrid');
-            if (xpGrid) {
-                xpGrid.innerHTML = members.map(m => `
-                    <div class="card-global p-10 flex flex-col justify-between h-64">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-4">
-                                <img src="${m.photo}" class="w-12 h-12 rounded-xl border border-slate-800 object-cover" onerror="this.src='${hydraLogo}'" />
-                                <h4 class="font-brand font-bold uppercase text-base">${m.nick}</h4>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[9px] font-black uppercase tracking-widest ${m.activePot ? 'text-cyan-500' : 'text-slate-700'}">${m.activePot ? 'Online' : 'Standby'}</span>
-                                <span class="w-2 h-2 rounded-full ${m.activePot ? 'bg-cyan-500 animate-pulse' : 'bg-slate-800'}"></span>
-                            </div>
-                        </div>
-                        ${m.activePot ? `
-                            <div class="mt-6">
-                                <p class="text-2xl font-brand font-black mb-6 text-white">${m.activePot.start} — ${m.activePot.end}</p>
-                                <button onclick="finishPot('${m.id}')" class="w-full btn-register py-4 justify-center text-[10px] bg-red-500/20 text-red-500 border border-red-500/30">FINALIZAR</button>
-                            </div>
-                        ` : `
-                            <div class="flex gap-3">
-                                <input type="time" id="start_${m.id}" class="flex-1 input-global text-xs">
-                                <input type="time" id="end_${m.id}" class="flex-1 input-global text-xs">
-                                <button onclick="startPot('${m.id}')" class="btn-register py-3 px-6 text-xs font-black">START</button>
-                            </div>
-                        `}
-                    </div>
-                `).join('');
-            }
-
-            const questGrid = document.getElementById('questMemberGrid');
-            if (questGrid) {
-                questGrid.innerHTML = members.map(m => `
-                    <div class="card-global p-10">
-                        <h4 class="font-brand font-bold mb-8 uppercase text-sm border-l-4 border-cyan-500 pl-4">${m.nick}</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            ${['AB1', 'AB2', 'AB3', 'CF'].map(q => `
-                                <div class="p-5 bg-slate-900/30 border border-slate-800/50 rounded-2xl flex flex-col gap-3">
-                                    <span class="text-[10px] font-black text-slate-500 tracking-widest">${q}</span>
-                                    ${(m.quests && m.quests[q]) ? 
-                                        `<span class="text-emerald-500 text-[10px] font-bold flex items-center gap-1">✓ COMPLETA</span>` : 
-                                        `<button onclick="completeQuest('${m.id}', '${q}')" class="text-[10px] text-cyan-500 font-bold hover:text-white transition text-left">MARCAR FEITA</button>`
-                                    }
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
     </script>
 </body>
 </html>
