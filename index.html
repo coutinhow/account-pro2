@@ -1,403 +1,395 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDG Company | Elite Gaming</title>
+    <title>CreditFlow Pro - Monochrome & Green Contrast</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-
-        .red-gradient {
-            background: linear-gradient(135deg, #ff0000 0%, #a30000 100%);
-        }
-
-        .glass-card {
-            background: rgba(15, 15, 15, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .glass-card:hover {
-            border-color: #ff0000;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 40px rgba(255, 0, 0, 0.2);
-        }
-
-        .text-glow {
-            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
-        }
-
-        .nav-link {
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -4px;
-            left: 0;
-            background-color: #ff0000;
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-fade {
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+        .modal-open { overflow: hidden; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        input[type="month"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        .glass { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-primary { background-color: #ffffff; color: #000000; }
+        .btn-primary:hover { background-color: #e2e2e2; }
+        
+        /* Destaque Verde para o Lucro */
+        .card-profit { background-color: #00ff41; color: #000000; border: none; }
+        .text-profit { color: #00ff41; }
+        
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #ff0000; border-radius: 4px; }
-
-        .text-outline {
-            -webkit-text-stroke: 1.5px #ff0000;
-        }
-
-        .carousel-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        .carousel-item {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            transition: opacity 0.8s ease-in-out;
-            background-size: cover;
-            background-position: center;
-        }
-        .carousel-item.active {
-            opacity: 0.65;
-        }
-        .carousel-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, 
-                rgba(0,0,0,0.95) 0%, 
-                rgba(0,0,0,0.2) 50%, 
-                rgba(0,0,0,1) 100%);
-        }
-
-        .tag-badge {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid #ff0000;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 900;
-            letter-spacing: 0.1em;
-        }
-
-        #joinModal {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        #joinModal.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        .input-pdg {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            width: 100%;
-            color: white;
-            font-weight: bold;
-            text-transform: uppercase;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .input-pdg:focus {
-            border-color: #ff0000;
-        }
-
-        /* Feedback Styles */
-        #formFeedback {
-            display: none;
-            padding: 1rem;
-            margin-top: 1rem;
-            text-align: center;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-size: 0.8rem;
-        }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
-<body class="selection:bg-red-600 selection:text-white">
+<body>
 
-    <!-- Navbar -->
-    <nav class="fixed w-full z-50 px-8 py-5 flex justify-between items-center bg-black/95 backdrop-blur-xl border-b border-red-900/40">
-        <div class="text-2xl font-black tracking-tighter italic">
-            PDG<span class="text-red-600">COMPANY</span>
-        </div>
-        <div class="hidden md:flex gap-10 text-xs font-bold tracking-[0.2em] uppercase items-center">
-            <a href="#inicio" class="nav-link">Início</a>
-            <a href="#lideranca" class="nav-link">Liderança</a>
-            <a href="#conquistas" class="nav-link">História</a>
-            <a href="#" class="nav-link">Clãs</a>
-            <button onclick="toggleModal()" class="text-red-500 hover:text-red-400 transition-colors uppercase tracking-widest font-black">Join Us</button>
-        </div>
-        <button class="md:hidden text-white" id="menuBtn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-    </nav>
-
-    <!-- Hero Section -->
-    <section id="inicio" class="min-h-screen flex flex-col justify-center items-center relative text-center overflow-hidden">
-        <div class="absolute inset-0 z-0 bg-black">
-            <div class="carousel-container" id="heroCarousel">
-                <div class="carousel-item active" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80');"></div>
-                <div class="carousel-item" style="background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80');"></div>
-                <div class="carousel-item" style="background-image: url('https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&q=80');"></div>
-                <div class="carousel-overlay"></div>
+    <!-- TELA DE LOGIN -->
+    <div id="loginPage" class="fixed inset-0 z-[100] bg-black flex items-center justify-center p-4">
+        <div class="glass p-10 rounded-[2rem] w-full max-w-sm text-center shadow-2xl border border-white/10">
+            <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
             </div>
-        </div>
-
-        <div class="z-10 animate-fade px-4">
-            <h2 class="text-xs md:text-sm tracking-[0.6em] uppercase text-red-600 font-black mb-6 text-glow">Bem-vinda à PDG Company</h2>
-            <h1 class="text-7xl md:text-[10rem] font-black tracking-tighter leading-none mb-8 italic uppercase text-white">
-                DOMÍNIO<br><span class="text-outline text-transparent">ABSOLUTO</span>
-            </h1>
-            <p class="max-w-2xl mx-auto text-white text-base md:text-lg mb-12 leading-relaxed font-medium drop-shadow-2xl">
-                Elevamos o padrão do gaming competitivo. Estrutura sólida, táticas agressivas e execução de elite.
-            </p>
-            <div class="flex flex-col md:flex-row gap-6 justify-center">
-                <button onclick="toggleModal()" class="red-gradient px-12 py-5 text-sm font-black uppercase tracking-widest rounded-sm hover:scale-105 transition-all shadow-xl shadow-red-900/30">
-                    Candidata-te Agora
-                </button>
-                <a href="#lideranca" class="bg-white px-12 py-5 text-sm font-black uppercase tracking-widest rounded-sm text-black hover:bg-red-600 hover:text-white transition-all">
-                    Ver Líder
-                </a>
-            </div>
-        </div>
-
-        <div class="absolute bottom-24 flex gap-3 z-20">
-            <div class="w-10 h-1.5 bg-red-600 rounded-full cursor-pointer transition-all" onclick="setSlide(0)"></div>
-            <div class="w-10 h-1.5 bg-white/30 rounded-full cursor-pointer transition-all" onclick="setSlide(1)"></div>
-            <div class="w-10 h-1.5 bg-white/30 rounded-full cursor-pointer transition-all" onclick="setSlide(2)"></div>
-        </div>
-    </section>
-
-    <!-- Leadership Section -->
-    <section id="lideranca" class="py-32 px-8 max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
-            <div>
-                <span class="text-red-600 font-black tracking-widest uppercase text-xs italic">O Comando</span>
-                <h3 class="text-6xl font-black uppercase tracking-tighter mt-2 italic text-white">Liderança</h3>
-            </div>
-            <p class="text-gray-400 max-w-sm text-sm font-medium border-l-2 border-red-600 pl-4">A força estratégica por trás da Company.</p>
-        </div>
-
-        <div class="flex justify-center">
-            <div class="glass-card p-10 group relative overflow-hidden w-full max-w-lg text-center">
-                <div class="mb-8 relative inline-block">
-                    <div class="absolute inset-0 bg-red-600 rounded-full blur-md opacity-20 group-hover:opacity-50 transition-opacity"></div>
-                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80" alt="Pardal" class="w-48 h-48 rounded-full border-4 border-red-600 object-cover relative z-10 grayscale hover:grayscale-0 transition-all duration-500 mx-auto">
-                </div>
-                
-                <div class="w-24 h-2 bg-red-600 mx-auto mb-8"></div>
-                <h4 class="text-6xl font-black mb-2 group-hover:text-red-500 transition-colors italic uppercase tracking-tighter text-white">Pardal</h4>
-                <p class="text-sm uppercase tracking-[0.5em] text-red-500 font-bold mb-10">Founder & CEO</p>
-                
-                <div class="flex gap-8 justify-center items-center">
-                    <a href="https://www.youtube.com/@PardalGaming" target="_blank" class="text-gray-400 hover:text-[#FF0000] transition-all transform hover:scale-125">
-                        <i class="fa-brands fa-youtube text-4xl"></i>
-                    </a>
-                    <a href="https://discord.gg/X7hCQ7hREM" target="_blank" class="text-gray-400 hover:text-[#5865F2] transition-all transform hover:scale-125">
-                        <i class="fa-brands fa-discord text-4xl"></i>
-                    </a>
-                    <a href="https://www.twitch.tv/pardalgamingtv" target="_blank" class="text-gray-400 hover:text-[#9146FF] transition-all transform hover:scale-125">
-                        <i class="fa-brands fa-twitch text-4xl"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Modal de Recrutamento -->
-    <div id="joinModal" class="fixed inset-0 z-[100] items-center justify-center p-4 bg-black/95 backdrop-blur-md">
-        <div class="glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 md:p-12 relative animate-fade">
-            <button onclick="toggleModal()" class="absolute top-6 right-6 text-white/50 hover:text-red-600 transition-colors">
-                <i class="fa-solid fa-xmark text-3xl"></i>
-            </button>
-
-            <div class="text-center mb-10">
-                <h3 class="text-4xl font-black uppercase italic text-glow">Protocolo Elite</h3>
-                <p class="text-red-600 text-[10px] tracking-[0.4em] uppercase font-black mt-2">Apenas os melhores são aceites</p>
-            </div>
-
-            <form id="recruitmentForm" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-1">
-                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Nick / Game ID</label>
-                        <input type="text" name="nick" required class="input-pdg" placeholder="Ex: Pardal">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Classe</label>
-                        <input type="text" name="classe" required class="input-pdg" placeholder="Ex: Assassino">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-1">
-                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Nível</label>
-                        <input type="number" name="nivel" required class="input-pdg" placeholder="99">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Nome Real</label>
-                        <input type="text" name="nome_real" required class="input-pdg" placeholder="Teu Nome">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-1">
-                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Idade</label>
-                        <input type="number" name="idade" required class="input-pdg" placeholder="18">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Número do WhatsApp</label>
-                        <input type="tel" name="whatsapp" required class="input-pdg" placeholder="+351 000 000 000">
-                    </div>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[10px] uppercase tracking-widest text-red-600 font-black">Discord</label>
-                    <input type="text" name="discord" required class="input-pdg" placeholder="username#0000">
-                </div>
-
-                <button type="submit" id="submitBtn" class="w-full red-gradient py-6 font-black uppercase tracking-[0.4em] text-lg hover:brightness-125 transition-all shadow-lg shadow-red-900/40">
-                    Enviar Candidatura
-                </button>
-
-                <div id="formFeedback"></div>
+            <h2 class="text-2xl font-black italic uppercase tracking-tighter mb-2">Gestão<span class="text-slate-400">Financeira</span></h2>
+            <p class="text-slate-500 text-[10px] mb-8 font-black uppercase tracking-widest">Acesso Restrito</p>
+            
+            <form id="loginForm" class="space-y-4">
+                <input type="password" id="loginPass" placeholder="SENHA" class="w-full p-4 rounded-xl bg-neutral-900 border border-neutral-800 outline-none focus:border-white text-center font-bold tracking-[0.5em] text-white">
+                <button type="submit" class="w-full p-4 rounded-xl btn-primary font-black uppercase text-xs tracking-widest transition-all active:scale-95">Entrar</button>
             </form>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="py-16 border-t border-red-900/30 px-8 text-center bg-black">
-        <div class="text-xl font-black text-white italic mb-6">PDG<span class="text-red-600">COMPANY</span></div>
-        <div class="mt-8 text-gray-700 text-[9px]">© 2026 PDG COMPANY - TODOS OS DIREITOS RESERVADOS.</div>
-    </footer>
+    <div id="mainApp" class="hidden min-h-screen">
+        <!-- NAVEGAÇÃO -->
+        <nav class="border-b px-6 py-4 flex justify-between items-center sticky top-0 z-30 bg-black/90 backdrop-blur-md border-neutral-800">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-xl font-black tracking-tighter italic uppercase">Financeira<span class="text-slate-500">Loja</span></h1>
+                </div>
+                <div class="hidden lg:flex p-1 rounded-xl gap-1 bg-neutral-900">
+                    <button onclick="changeTab('dashboard')" id="tab-dashboard" class="tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all bg-white text-black shadow-sm">Geral</button>
+                    <button onclick="changeTab('venda')" id="tab-venda" class="tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all text-slate-500 hover:text-white">Vendas</button>
+                    <button onclick="changeTab('despesa')" id="tab-despesa" class="tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all text-slate-500 hover:text-white">Despesas</button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button onclick="openModal()" class="hidden md:flex btn-primary px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest items-center gap-2 transition-all active:scale-95">
+                    <span>+ ADICIONAR</span>
+                </button>
+                
+                <div class="relative group">
+                    <button onclick="toggleProfile()" class="flex items-center gap-3 p-1 pr-3 rounded-full bg-neutral-900 hover:bg-neutral-800 transition-all border border-neutral-800">
+                        <img id="userImg" src="https://ui-avatars.com/api/?name=User&background=333&color=fff" class="w-8 h-8 rounded-full object-cover border border-white/20">
+                        <div class="text-left hidden sm:block">
+                            <p id="userNameDisplay" class="text-[10px] font-black uppercase leading-none">Usuário</p>
+                            <p id="userRoleDisplay" class="text-[8px] text-slate-500 uppercase tracking-tighter">Admin</p>
+                        </div>
+                    </button>
+                    <div id="profileMenu" class="hidden absolute right-0 mt-3 w-64 glass rounded-2xl shadow-2xl p-6 overflow-hidden border border-white/10">
+                        <div class="text-center mb-6">
+                            <label class="cursor-pointer group relative block w-20 h-20 mx-auto mb-4">
+                                <img id="userImgBig" src="https://ui-avatars.com/api/?name=User&background=333&color=fff" class="w-20 h-20 rounded-full object-cover border-2 border-white shadow-xl">
+                                <input type="file" id="photoInput" class="hidden" accept="image/*" onchange="updatePhoto(this)">
+                                <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                </div>
+                            </label>
+                            <input id="userNameInput" placeholder="SEU NOME" class="bg-transparent text-center font-black uppercase text-sm border-b border-neutral-800 w-full mb-2 outline-none focus:border-white py-1" onchange="saveProfile()">
+                            <input id="userRoleInput" placeholder="CARGO" class="bg-transparent text-center text-[10px] text-slate-500 w-full outline-none font-bold uppercase tracking-widest" onchange="saveProfile()">
+                        </div>
+                        <button onclick="logout()" class="w-full p-3 rounded-xl bg-neutral-900 hover:bg-white hover:text-black text-[10px] font-black uppercase tracking-widest transition-all border border-white/5">Sair</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- CONTEÚDO -->
+        <main class="max-w-7xl mx-auto p-6 space-y-6">
+            <!-- Cards de Resumo -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-neutral-900 border-neutral-800 p-6 rounded-2xl border">
+                    <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Volume Máquina</p>
+                    <h4 id="totalBruto" class="text-2xl font-black mt-2 tabular-nums">R$ 0,00</h4>
+                </div>
+                <!-- Card Verde Neon para Contraste -->
+                <div class="card-profit p-6 rounded-2xl shadow-lg transform scale-105 z-10">
+                    <p class="text-black text-[9px] font-black uppercase tracking-widest opacity-70">Lucro Antecipação</p>
+                    <h4 id="totalLucro" class="text-2xl font-black mt-2 tabular-nums">R$ 0,00</h4>
+                </div>
+                <div class="bg-neutral-900 border-neutral-800 p-6 rounded-2xl border">
+                    <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Despesas Fixas</p>
+                    <h4 id="totalDespesas" class="text-2xl font-black mt-2 tabular-nums text-slate-300">R$ 0,00</h4>
+                </div>
+                <div class="bg-neutral-900 border-neutral-800 p-6 rounded-2xl border ring-1 ring-white/20">
+                    <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Saldo Final</p>
+                    <h4 id="totalSaldo" class="text-2xl font-black mt-2 tabular-nums">R$ 0,00</h4>
+                </div>
+            </div>
+
+            <div id="chartsSection" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-neutral-900 border border-neutral-800 p-8 rounded-2xl">
+                    <h3 class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-8">Fluxo de Lucro</h3>
+                    <div class="h-[300px] w-full"><canvas id="lineChart"></canvas></div>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 p-8 rounded-2xl">
+                    <h3 class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-8">Divisão de Gastos</h3>
+                    <div class="h-[300px] w-full"><canvas id="pieChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- TABELA -->
+            <div class="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden shadow-xl">
+                <div class="p-6 border-b border-neutral-800 flex flex-wrap gap-4 justify-between items-center bg-neutral-900/50">
+                    <h3 class="font-black text-[10px] uppercase tracking-widest text-white">Extrato Consolidado</h3>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[8px] font-black uppercase text-slate-500">Mês:</span>
+                            <input type="month" id="dateFilter" class="bg-black text-[10px] font-black uppercase border border-neutral-800 rounded-lg p-2 text-white outline-none focus:border-white transition-colors" onchange="render()">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[8px] font-black uppercase text-slate-500">Dia Específico:</span>
+                            <input type="date" id="dayFilter" class="bg-black text-[10px] font-black uppercase border border-neutral-800 rounded-lg p-2 text-white outline-none focus:border-white transition-colors" onchange="render()">
+                        </div>
+                        <button onclick="clearFilters()" class="text-[8px] font-black uppercase text-slate-400 hover:text-white underline px-2">Limpar</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="text-[9px] uppercase font-black tracking-widest bg-black text-slate-500">
+                            <tr>
+                                <th class="p-5 border-b border-neutral-800">Data</th>
+                                <th class="p-5 border-b border-neutral-800">Descrição</th>
+                                <th class="p-5 border-b border-neutral-800">Modalidade</th>
+                                <th class="p-5 border-b border-neutral-800 text-right">Volume</th>
+                                <th class="p-5 border-b border-neutral-800 text-right">Resultado</th>
+                                <th class="p-5 border-b border-neutral-800 text-center"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionList" class="divide-y divide-neutral-800"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal" class="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-neutral-900 border border-neutral-800 p-10 rounded-[2.5rem] w-full max-w-md shadow-2xl relative">
+            <h2 class="text-xl font-black tracking-widest uppercase italic text-white mb-8 border-b border-white/10 pb-4">Lançamento</h2>
+            
+            <div class="flex p-1 bg-black rounded-xl mb-8 border border-white/5">
+                <button onclick="setFormType('venda')" id="btnTypeVenda" class="flex-1 py-3 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all bg-white text-black">Antecipação</button>
+                <button onclick="setFormType('despesa')" id="btnTypeDespesa" class="flex-1 py-3 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all text-slate-500">Despesa</button>
+            </div>
+
+            <form id="recordForm" class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Descrição</label>
+                    <input id="fDescription" required class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white" placeholder="...">
+                </div>
+                <div id="vendaFields" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Vlr Máquina</label>
+                            <input id="fMachineValue" type="number" step="0.01" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white" placeholder="0,00">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Vlr Cliente</label>
+                            <input id="fClientValue" type="number" step="0.01" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white" placeholder="0,00">
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Parcelamento</label>
+                        <select id="fPaymentMethod" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-black text-[10px] uppercase outline-none focus:border-white appearance-none"></select>
+                    </div>
+                </div>
+                <div id="despesaFields" class="hidden">
+                    <div class="space-y-1">
+                        <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Valor Total</label>
+                        <input id="fAmount" type="number" step="0.01" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white" placeholder="0,00">
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Data Competência</label>
+                    <input id="fDate" type="date" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white">
+                </div>
+                <div class="grid grid-cols-2 gap-4 pt-6">
+                    <button type="button" onclick="closeModal()" class="p-4 rounded-xl bg-black border border-neutral-800 hover:bg-neutral-800 text-white font-black uppercase tracking-widest text-[9px] transition-colors">Cancelar</button>
+                    <button type="submit" class="p-4 rounded-xl btn-primary font-black uppercase tracking-widest text-[9px] shadow-lg">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
-        // --- CONFIGURAÇÃO SUPABASE ATUALIZADA ---
-        const SUPABASE_URL = 'https://wydtvzuyknwliskbklgq.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'sb_publishable_yTWogZAxVhhUVNPZ8q0cKA_vpZrSJO1';
-        
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let transactions = JSON.parse(localStorage.getItem('creditflow_data')) || [];
+        let profile = JSON.parse(localStorage.getItem('creditflow_profile')) || { name: 'Admin User', role: 'Diretor Financeiro', photo: '' };
+        let activeTab = 'dashboard';
+        let currentType = 'venda';
+        let lineChart, pieChart;
 
-        // Modal Logic
-        function toggleModal() {
-            const modal = document.getElementById('joinModal');
-            if (modal.classList.contains('active')) {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            } else {
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
+        const CARD_RATES = { 'DEBITO': 1.69, '1X': 3.5, '12X': 10.90 };
+        for(let i=2; i<=18; i++) { if(!CARD_RATES[i+'X']) CARD_RATES[i+'X'] = 4.5 + (i * 0.55); }
 
-        // Carousel Logic
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.carousel-item');
-        const indicators = document.querySelectorAll('.bottom-24 div');
-
-        function showSlide(n) {
-            slides.forEach(slide => slide.classList.remove('active'));
-            indicators.forEach(ind => {
-                ind.classList.remove('bg-red-600');
-                ind.classList.add('bg-white/30');
-                ind.style.width = "40px";
-            });
-            currentSlide = (n + slides.length) % slides.length;
-            slides[currentSlide].classList.add('active');
-            indicators[currentSlide].classList.add('bg-red-600');
-            indicators[currentSlide].classList.remove('bg-white/30');
-            indicators[currentSlide].style.width = "60px";
-        }
-        function setSlide(n) { showSlide(n); }
-        function nextSlide() { showSlide(currentSlide + 1); }
-        setInterval(nextSlide, 5000);
-
-        // --- SUBMISSÃO PARA O SUPABASE ---
-        document.getElementById('recruitmentForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').onsubmit = (e) => {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const feedback = document.getElementById('formFeedback');
-            const formData = new FormData(this);
-            
-            const userData = {
-                nick: formData.get('nick'),
-                classe: formData.get('classe'),
-                nivel: parseInt(formData.get('nivel')),
-                nome_real: formData.get('nome_real'),
-                idade: parseInt(formData.get('idade')),
-                whatsapp: formData.get('whatsapp'),
-                discord: formData.get('discord'),
-                created_at: new Date()
-            };
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').classList.remove('hidden');
+            init();
+        };
 
-            // Estilo de carregamento
-            btn.innerText = "PROCESSANDO DADOS...";
-            btn.disabled = true;
-            feedback.style.display = "none";
-
-            try {
-                const { data, error } = await _supabase
-                    .from('recrutamento')
-                    .insert([userData]);
-
-                if (error) throw error;
-
-                // Sucesso
-                feedback.style.display = "block";
-                feedback.style.color = "#00ff00";
-                feedback.innerText = "CANDIDATURA ENVIADA COM SUCESSO!";
-                
-                setTimeout(() => {
-                    this.reset();
-                    toggleModal();
-                    feedback.style.display = "none";
-                }, 3000);
-
-            } catch (error) {
-                console.error('Erro:', error);
-                feedback.style.display = "block";
-                feedback.style.color = "#ff0000";
-                feedback.innerText = "ERRO: VERIFIQUE SE A TABELA 'RECRUTAMENTO' EXISTE.";
-            } finally {
-                btn.innerText = "Enviar Candidatura";
-                btn.disabled = false;
+        function logout() { location.reload(); }
+        function toggleProfile() { document.getElementById('profileMenu').classList.toggle('hidden'); }
+        function saveProfile() {
+            profile.name = document.getElementById('userNameInput').value;
+            profile.role = document.getElementById('userRoleInput').value;
+            localStorage.setItem('creditflow_profile', JSON.stringify(profile));
+            updateProfileUI();
+        }
+        function updatePhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    profile.photo = e.target.result;
+                    localStorage.setItem('creditflow_profile', JSON.stringify(profile));
+                    updateProfileUI();
+                };
+                reader.readAsDataURL(input.files[0]);
             }
-        });
+        }
+        function updateProfileUI() {
+            document.getElementById('userNameDisplay').innerText = profile.name;
+            document.getElementById('userRoleDisplay').innerText = profile.role;
+            document.getElementById('userNameInput').value = profile.name;
+            document.getElementById('userRoleInput').value = profile.role;
+            const photo = profile.photo || `https://ui-avatars.com/api/?name=${profile.name}&background=111&color=fff`;
+            document.getElementById('userImg').src = photo;
+            document.getElementById('userImgBig').src = photo;
+        }
+
+        function formatCurrency(val) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val); }
+
+        window.openModal = () => { 
+            document.getElementById('modal').classList.remove('hidden'); 
+            document.getElementById('fDate').value = new Date().toISOString().split('T')[0]; 
+        };
+        window.closeModal = () => { document.getElementById('modal').classList.add('hidden'); document.getElementById('recordForm').reset(); };
+
+        window.setFormType = (type) => {
+            currentType = type;
+            document.getElementById('vendaFields').classList.toggle('hidden', type !== 'venda');
+            document.getElementById('despesaFields').classList.toggle('hidden', type === 'venda');
+            document.getElementById('btnTypeVenda').className = type === 'venda' ? "flex-1 py-3 rounded-lg text-[9px] font-black uppercase bg-white text-black" : "flex-1 py-3 text-slate-500 font-black uppercase";
+            document.getElementById('btnTypeDespesa').className = type === 'despesa' ? "flex-1 py-3 rounded-lg text-[9px] font-black uppercase bg-white text-black" : "flex-1 py-3 text-slate-500 font-black uppercase";
+        };
+
+        window.changeTab = (tab) => {
+            activeTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.className = "tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500");
+            document.getElementById('tab-' + tab).className = "tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-black shadow-sm";
+            document.getElementById('chartsSection').classList.toggle('hidden', tab !== 'dashboard');
+            render();
+        };
+
+        window.clearFilters = () => {
+            document.getElementById('dayFilter').value = '';
+            document.getElementById('dateFilter').value = new Date().toISOString().substring(0, 7);
+            render();
+        }
+
+        function updateCharts(data) {
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            const ctxPie = document.getElementById('pieChart').getContext('2d');
+            
+            const daily = {};
+            data.forEach(t => { if(t.type === 'venda') { if(!daily[t.date]) daily[t.date] = 0; daily[t.date] += t.profit; } });
+            const labels = Object.keys(daily).sort().slice(-7);
+            const points = labels.map(l => daily[l]);
+
+            if(lineChart) lineChart.destroy();
+            lineChart = new Chart(ctxLine, {
+                type: 'line',
+                data: { labels, datasets: [{ data: points, borderColor: '#00ff41', backgroundColor: 'rgba(0, 255, 65, 0.05)', fill: true, tension: 0.3, borderWidth: 2, pointBackgroundColor: '#00ff41' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { color: '#222' }, ticks: { color: '#555', font: { size: 9, weight: 'bold' } } } } }
+            });
+
+            let tL = 0, tD = 0;
+            data.forEach(t => { if(t.type === 'venda') tL += t.profit; else tD += t.amount; });
+            if(pieChart) pieChart.destroy();
+            pieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: { labels: ['LUCRO', 'GASTOS'], datasets: [{ data: [tL, tD], backgroundColor: ['#00ff41', '#333333'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#555', boxWidth: 8, font: { size: 9, weight: '900' }, padding: 20 } } }, cutout: '85%' }
+            });
+        }
+
+        function render() {
+            const list = document.getElementById('transactionList');
+            const filterMonth = document.getElementById('dateFilter').value;
+            const filterDay = document.getElementById('dayFilter').value;
+            list.innerHTML = '';
+            
+            let bruto = 0, lucro = 0, despesa = 0;
+            const filtered = transactions.filter(t => {
+                const matchesTab = activeTab === 'dashboard' || t.type === activeTab;
+                
+                // Prioridade para o filtro de dia se estiver preenchido
+                let matchesTime = false;
+                if (filterDay) {
+                    matchesTime = t.date === filterDay;
+                } else {
+                    matchesTime = !filterMonth || t.date.substring(0, 7) === filterMonth;
+                }
+
+                if(matchesTime) {
+                    if(t.type === 'venda') { bruto += t.grossAmount; lucro += t.profit; }
+                    else { despesa += t.amount; }
+                }
+                return matchesTab && matchesTime;
+            });
+
+            document.getElementById('totalBruto').innerText = formatCurrency(bruto);
+            document.getElementById('totalLucro').innerText = formatCurrency(lucro);
+            document.getElementById('totalDespesas').innerText = formatCurrency(despesa);
+            document.getElementById('totalSaldo').innerText = formatCurrency(lucro - despesa);
+
+            if (activeTab === 'dashboard') updateCharts(filtered);
+
+            filtered.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.className = "text-[10px] hover:bg-neutral-800 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-5 text-slate-500 font-bold uppercase tracking-widest">${t.date.split('-').reverse().join('/')}</td>
+                    <td class="p-5 font-black text-white uppercase tracking-tight">${t.description}</td>
+                    <td class="p-5"><span class="px-2 py-1 bg-black border border-neutral-800 text-slate-400 font-black">${t.type === 'venda' ? t.paymentMethod : 'DESPESA'}</span></td>
+                    <td class="p-5 text-right text-slate-500 tabular-nums">${formatCurrency(t.type === 'venda' ? t.grossAmount : t.amount)}</td>
+                    <td class="p-5 text-right font-black tabular-nums ${t.type === 'venda' ? 'text-profit' : 'text-slate-500'}">${t.type === 'venda' ? '+' : '-'}${formatCurrency(t.type === 'venda' ? t.profit : t.amount)}</td>
+                    <td class="p-5 text-center"><button onclick="deleteTransaction(${t.id})" class="text-slate-700 hover:text-white transition-colors">✕</button></td>
+                `;
+                list.appendChild(tr);
+            });
+        }
+
+        window.deleteTransaction = (id) => { if(confirm('Excluir registro?')) { transactions = transactions.filter(t => t.id !== id); saveAndRender(); } };
+        function saveAndRender() { localStorage.setItem('creditflow_data', JSON.stringify(transactions)); render(); }
+
+        document.getElementById('recordForm').onsubmit = (e) => {
+            e.preventDefault();
+            const data = { id: Date.now(), type: currentType, description: document.getElementById('fDescription').value, date: document.getElementById('fDate').value };
+            if (currentType === 'venda') {
+                const m = parseFloat(document.getElementById('fMachineValue').value);
+                const c = parseFloat(document.getElementById('fClientValue').value);
+                const r = CARD_RATES[document.getElementById('fPaymentMethod').value];
+                data.grossAmount = m;
+                data.profit = (m * (1 - r/100)) - c;
+                data.paymentMethod = document.getElementById('fPaymentMethod').value;
+            } else {
+                data.amount = parseFloat(document.getElementById('fAmount').value);
+            }
+            transactions.push(data);
+            transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
+            saveAndRender();
+            closeModal();
+        };
+
+        function init() {
+            const sel = document.getElementById('fPaymentMethod');
+            sel.innerHTML = '<option value="DEBITO">DÉBITO (1.69%)</option>';
+            const order = ['1X', '2X', '3X', '4X', '5X', '6X', '7X', '8X', '9X', '10X', '11X', '12X', '13X', '14X', '15X', '16X', '17X', '18X'];
+            order.forEach(k => {
+                const opt = document.createElement('option');
+                opt.value = k; opt.innerText = `${k} CRÉDITO (${CARD_RATES[k].toFixed(2)}%)`;
+                sel.appendChild(opt);
+            });
+            document.getElementById('dateFilter').value = new Date().toISOString().substring(0, 7);
+            updateProfileUI();
+            render();
+        }
     </script>
 </body>
 </html>
