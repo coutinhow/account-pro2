@@ -2,39 +2,43 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CreditFlow Pro - Monochrome & Green Contrast</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CreditFlow Pro - Mobile Optimized</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
-        .modal-open { overflow: hidden; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; -webkit-tap-highlight-color: transparent; }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="month"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        
         .glass { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .btn-primary { background-color: #ffffff; color: #000000; }
-        .btn-primary:hover { background-color: #e2e2e2; }
         
         /* Destaque Verde para o Lucro */
         .card-profit { background-color: #00ff41; color: #000000; border: none; }
         .text-profit { color: #00ff41; }
         
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        /* Ajuste para não cortar conteúdo por causa da barra inferior no celular */
+        .content-padding { padding-bottom: 100px; }
+
+        @media (max-width: 768px) {
+            .tab-btn-active { color: #00ff41 !important; }
+            .mobile-hide { display: none; }
+        }
     </style>
 </head>
-<body>
+<body class="content-padding">
 
     <!-- TELA DE LOGIN -->
     <div id="loginPage" class="fixed inset-0 z-[100] bg-black flex items-center justify-center p-4">
-        <div class="glass p-10 rounded-[2rem] w-full max-w-sm text-center shadow-2xl border border-white/10">
-            <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+        <div class="glass p-8 rounded-[2rem] w-full max-w-sm text-center shadow-2xl border border-white/10">
+            <div class="bg-white w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
             </div>
-            <h2 class="text-2xl font-black italic uppercase tracking-tighter mb-2">Gestão<span class="text-slate-400">Financeira</span></h2>
-            <p class="text-slate-500 text-[10px] mb-8 font-black uppercase tracking-widest">Acesso Restrito</p>
+            <h2 class="text-xl font-black italic uppercase tracking-tighter mb-1">Credit<span class="text-slate-400">Flow</span></h2>
+            <p class="text-slate-500 text-[9px] mb-8 font-black uppercase tracking-widest">Acesso Restrito</p>
             
             <form id="loginForm" class="space-y-4">
                 <input type="password" id="loginPass" placeholder="SENHA" class="w-full p-4 rounded-xl bg-neutral-900 border border-neutral-800 outline-none focus:border-white text-center font-bold tracking-[0.5em] text-white">
@@ -44,110 +48,122 @@
     </div>
 
     <div id="mainApp" class="hidden min-h-screen">
-        <!-- NAVEGAÇÃO -->
+        <!-- NAVEGAÇÃO SUPERIOR -->
         <nav class="border-b px-6 py-4 flex justify-between items-center sticky top-0 z-30 bg-black/90 backdrop-blur-md border-neutral-800">
             <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2">
-                    <h1 class="text-xl font-black tracking-tighter italic uppercase">Financeira<span class="text-slate-500">Loja</span></h1>
-                </div>
-                <div class="hidden lg:flex p-1 rounded-xl gap-1 bg-neutral-900">
-                    <button onclick="changeTab('dashboard')" id="tab-dashboard" class="tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all bg-white text-black shadow-sm">Geral</button>
-                    <button onclick="changeTab('venda')" id="tab-venda" class="tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all text-slate-500 hover:text-white">Vendas</button>
-                    <button onclick="changeTab('despesa')" id="tab-despesa" class="tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all text-slate-500 hover:text-white">Despesas</button>
+                <h1 class="text-xl font-black tracking-tighter italic uppercase">Credit<span class="text-slate-500">Flow</span></h1>
+                
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex p-1 rounded-xl gap-1 bg-neutral-900">
+                    <button onclick="changeTab('dashboard')" id="tab-dashboard-dt" class="tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all bg-white text-black">Geral</button>
+                    <button onclick="changeTab('venda')" id="tab-venda-dt" class="tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all text-slate-500 hover:text-white">Vendas</button>
+                    <button onclick="changeTab('despesa')" id="tab-despesa-dt" class="tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all text-slate-500 hover:text-white">Despesas</button>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <button onclick="openModal()" class="hidden md:flex btn-primary px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest items-center gap-2 transition-all active:scale-95">
-                    <span>+ ADICIONAR</span>
+                <button onclick="openModal()" class="btn-primary px-4 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95">
+                    <span>+ NOVO</span>
                 </button>
                 
-                <div class="relative group">
-                    <button onclick="toggleProfile()" class="flex items-center gap-3 p-1 pr-3 rounded-full bg-neutral-900 hover:bg-neutral-800 transition-all border border-neutral-800">
-                        <img id="userImg" src="https://ui-avatars.com/api/?name=User&background=333&color=fff" class="w-8 h-8 rounded-full object-cover border border-white/20">
-                        <div class="text-left hidden sm:block">
-                            <p id="userNameDisplay" class="text-[10px] font-black uppercase leading-none">Usuário</p>
-                            <p id="userRoleDisplay" class="text-[8px] text-slate-500 uppercase tracking-tighter">Admin</p>
-                        </div>
-                    </button>
-                    <div id="profileMenu" class="hidden absolute right-0 mt-3 w-64 glass rounded-2xl shadow-2xl p-6 overflow-hidden border border-white/10">
-                        <div class="text-center mb-6">
-                            <label class="cursor-pointer group relative block w-20 h-20 mx-auto mb-4">
-                                <img id="userImgBig" src="https://ui-avatars.com/api/?name=User&background=333&color=fff" class="w-20 h-20 rounded-full object-cover border-2 border-white shadow-xl">
-                                <input type="file" id="photoInput" class="hidden" accept="image/*" onchange="updatePhoto(this)">
-                                <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                </div>
-                            </label>
-                            <input id="userNameInput" placeholder="SEU NOME" class="bg-transparent text-center font-black uppercase text-sm border-b border-neutral-800 w-full mb-2 outline-none focus:border-white py-1" onchange="saveProfile()">
-                            <input id="userRoleInput" placeholder="CARGO" class="bg-transparent text-center text-[10px] text-slate-500 w-full outline-none font-bold uppercase tracking-widest" onchange="saveProfile()">
-                        </div>
-                        <button onclick="logout()" class="w-full p-3 rounded-xl bg-neutral-900 hover:bg-white hover:text-black text-[10px] font-black uppercase tracking-widest transition-all border border-white/5">Sair</button>
-                    </div>
-                </div>
+                <button onclick="toggleProfile()" class="flex items-center gap-2 p-1 rounded-full bg-neutral-900 border border-neutral-800">
+                    <img id="userImg" src="https://ui-avatars.com/api/?name=User&background=333&color=fff" class="w-8 h-8 rounded-full object-cover">
+                </button>
             </div>
         </nav>
 
+        <!-- MENU MOBILE (FIXO NO RODAPÉ) -->
+        <div class="md:hidden fixed bottom-0 left-0 right-0 bg-neutral-900/90 backdrop-blur-xl border-t border-white/10 z-40 px-6 py-3 flex justify-around items-center">
+            <button onclick="changeTab('dashboard')" id="tab-dashboard-mb" class="flex flex-col items-center gap-1 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                <span class="text-[8px] font-black uppercase tracking-tighter">Início</span>
+            </button>
+            <button onclick="changeTab('venda')" id="tab-venda-mb" class="flex flex-col items-center gap-1 text-slate-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 15 2 2 4-4"/><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
+                <span class="text-[8px] font-black uppercase tracking-tighter">Vendas</span>
+            </button>
+            <button onclick="changeTab('despesa')" id="tab-despesa-mb" class="flex flex-col items-center gap-1 text-slate-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/><path d="M2 12h20"/><path d="m5 7 3 5-3 5"/><path d="m19 7-3 5 3 5"/></svg>
+                <span class="text-[8px] font-black uppercase tracking-tighter">Gastos</span>
+            </button>
+        </div>
+
+        <!-- MENU DE PERFIL -->
+        <div id="profileMenu" class="hidden fixed top-20 right-6 w-64 glass rounded-2xl shadow-2xl p-6 z-50 border border-white/10">
+            <div class="text-center mb-6">
+                <label class="cursor-pointer group relative block w-16 h-16 mx-auto mb-4">
+                    <img id="userImgBig" src="https://ui-avatars.com/api/?name=User&background=333&color=fff" class="w-16 h-16 rounded-full object-cover border border-white/20 shadow-xl">
+                    <input type="file" id="photoInput" class="hidden" accept="image/*" onchange="updatePhoto(this)">
+                </label>
+                <input id="userNameInput" placeholder="SEU NOME" class="bg-transparent text-center font-black uppercase text-xs border-b border-neutral-800 w-full mb-2 outline-none focus:border-white py-1" onchange="saveProfile()">
+                <p id="userRoleDisplay" class="text-[8px] text-slate-500 uppercase tracking-widest">ADMINISTRADOR</p>
+            </div>
+            <button onclick="logout()" class="w-full p-3 rounded-xl bg-neutral-800 hover:bg-white hover:text-black text-[10px] font-black uppercase tracking-widest transition-all">Sair</button>
+        </div>
+
         <!-- CONTEÚDO -->
-        <main class="max-w-7xl mx-auto p-6 space-y-6">
-            <!-- Cards de Resumo -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-neutral-900 border-neutral-800 p-6 rounded-2xl border">
-                    <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Volume Máquina</p>
-                    <h4 id="totalBruto" class="text-2xl font-black mt-2 tabular-nums">R$ 0,00</h4>
+        <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+            <!-- Cards de Resumo (Scroll horizontal no mobile) -->
+            <div class="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+                <div class="min-w-[200px] flex-shrink-0 bg-neutral-900 border-neutral-800 p-5 rounded-2xl border">
+                    <p class="text-slate-500 text-[8px] font-black uppercase tracking-widest">Volume Máquina</p>
+                    <h4 id="totalBruto" class="text-xl font-black mt-1 tabular-nums">R$ 0,00</h4>
                 </div>
-                <!-- Card Verde Neon para Contraste -->
-                <div class="card-profit p-6 rounded-2xl shadow-lg transform scale-105 z-10">
-                    <p class="text-black text-[9px] font-black uppercase tracking-widest opacity-70">Lucro Antecipação</p>
-                    <h4 id="totalLucro" class="text-2xl font-black mt-2 tabular-nums">R$ 0,00</h4>
+                <div class="min-w-[200px] flex-shrink-0 card-profit p-5 rounded-2xl shadow-lg">
+                    <p class="text-black text-[8px] font-black uppercase tracking-widest opacity-70">Lucro Antecipação</p>
+                    <h4 id="totalLucro" class="text-xl font-black mt-1 tabular-nums">R$ 0,00</h4>
                 </div>
-                <div class="bg-neutral-900 border-neutral-800 p-6 rounded-2xl border">
-                    <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Despesas Fixas</p>
-                    <h4 id="totalDespesas" class="text-2xl font-black mt-2 tabular-nums text-slate-300">R$ 0,00</h4>
+                <div class="min-w-[200px] flex-shrink-0 bg-neutral-900 border-neutral-800 p-5 rounded-2xl border">
+                    <p class="text-slate-500 text-[8px] font-black uppercase tracking-widest">Despesas Fixas</p>
+                    <h4 id="totalDespesas" class="text-xl font-black mt-1 tabular-nums text-slate-400">R$ 0,00</h4>
                 </div>
-                <div class="bg-neutral-900 border-neutral-800 p-6 rounded-2xl border ring-1 ring-white/20">
-                    <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Saldo Final</p>
-                    <h4 id="totalSaldo" class="text-2xl font-black mt-2 tabular-nums">R$ 0,00</h4>
+                <div class="min-w-[200px] flex-shrink-0 bg-neutral-900 border-neutral-800 p-5 rounded-2xl border ring-1 ring-white/10">
+                    <p class="text-slate-500 text-[8px] font-black uppercase tracking-widest">Saldo Final</p>
+                    <h4 id="totalSaldo" class="text-xl font-black mt-1 tabular-nums">R$ 0,00</h4>
                 </div>
             </div>
 
             <div id="chartsSection" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-neutral-900 border border-neutral-800 p-8 rounded-2xl">
-                    <h3 class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-8">Fluxo de Lucro</h3>
-                    <div class="h-[300px] w-full"><canvas id="lineChart"></canvas></div>
+                <div class="lg:col-span-2 bg-neutral-900 border border-neutral-800 p-6 rounded-2xl">
+                    <h3 class="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-6">Fluxo de Lucro</h3>
+                    <div class="h-[250px] w-full"><canvas id="lineChart"></canvas></div>
                 </div>
-                <div class="bg-neutral-900 border border-neutral-800 p-8 rounded-2xl">
-                    <h3 class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-8">Divisão de Gastos</h3>
-                    <div class="h-[300px] w-full"><canvas id="pieChart"></canvas></div>
+                <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl md:block hidden">
+                    <h3 class="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-6">Distribuição</h3>
+                    <div class="h-[250px] w-full"><canvas id="pieChart"></canvas></div>
                 </div>
             </div>
 
             <!-- TABELA -->
             <div class="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden shadow-xl">
-                <div class="p-6 border-b border-neutral-800 flex flex-wrap gap-4 justify-between items-center bg-neutral-900/50">
-                    <h3 class="font-black text-[10px] uppercase tracking-widest text-white">Extrato Consolidado</h3>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[8px] font-black uppercase text-slate-500">Mês:</span>
-                            <input type="month" id="dateFilter" class="bg-black text-[10px] font-black uppercase border border-neutral-800 rounded-lg p-2 text-white outline-none focus:border-white transition-colors" onchange="render()">
+                <div class="p-5 border-b border-neutral-800 flex flex-col gap-4 bg-neutral-900/50">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-black text-[9px] uppercase tracking-widest text-white">Extrato de Operações</h3>
+                        <button onclick="clearFilters()" class="text-[8px] font-black uppercase text-slate-500 hover:text-white underline">Limpar Filtros</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1">
+                            <span class="text-[7px] font-black uppercase text-slate-500 ml-1">Por Mês</span>
+                            <input type="month" id="dateFilter" class="w-full bg-black text-[10px] font-black uppercase border border-neutral-800 rounded-xl p-3 text-white outline-none focus:border-white" onchange="render()">
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[8px] font-black uppercase text-slate-500">Dia Específico:</span>
-                            <input type="date" id="dayFilter" class="bg-black text-[10px] font-black uppercase border border-neutral-800 rounded-lg p-2 text-white outline-none focus:border-white transition-colors" onchange="render()">
+                        <div class="space-y-1">
+                            <span class="text-[7px] font-black uppercase text-slate-500 ml-1">Por Dia</span>
+                            <input type="date" id="dayFilter" class="w-full bg-black text-[10px] font-black uppercase border border-neutral-800 rounded-xl p-3 text-white outline-none focus:border-white" onchange="render()">
                         </div>
-                        <button onclick="clearFilters()" class="text-[8px] font-black uppercase text-slate-400 hover:text-white underline px-2">Limpar</button>
                     </div>
                 </div>
+                
+                <!-- Tabela Responsiva (Scroll horizontal) -->
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="text-[9px] uppercase font-black tracking-widest bg-black text-slate-500">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead class="text-[8px] uppercase font-black tracking-widest bg-black text-slate-600">
                             <tr>
-                                <th class="p-5 border-b border-neutral-800">Data</th>
-                                <th class="p-5 border-b border-neutral-800">Descrição</th>
-                                <th class="p-5 border-b border-neutral-800">Modalidade</th>
-                                <th class="p-5 border-b border-neutral-800 text-right">Volume</th>
-                                <th class="p-5 border-b border-neutral-800 text-right">Resultado</th>
-                                <th class="p-5 border-b border-neutral-800 text-center"></th>
+                                <th class="p-4 border-b border-neutral-800">Data</th>
+                                <th class="p-4 border-b border-neutral-800">Descrição</th>
+                                <th class="p-4 border-b border-neutral-800">Tipo</th>
+                                <th class="p-4 border-b border-neutral-800 text-right">Valor</th>
+                                <th class="p-4 border-b border-neutral-800 text-right">Resultado</th>
+                                <th class="p-4 border-b border-neutral-800 text-center"></th>
                             </tr>
                         </thead>
                         <tbody id="transactionList" class="divide-y divide-neutral-800"></tbody>
@@ -158,49 +174,35 @@
     </div>
 
     <!-- MODAL -->
-    <div id="modal" class="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-neutral-900 border border-neutral-800 p-10 rounded-[2.5rem] w-full max-w-md shadow-2xl relative">
-            <h2 class="text-xl font-black tracking-widest uppercase italic text-white mb-8 border-b border-white/10 pb-4">Lançamento</h2>
+    <div id="modal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-neutral-900 border border-neutral-800 p-8 rounded-[2rem] w-full max-w-sm shadow-2xl">
+            <h2 class="text-lg font-black tracking-widest uppercase italic text-white mb-6">Novo Registro</h2>
             
-            <div class="flex p-1 bg-black rounded-xl mb-8 border border-white/5">
-                <button onclick="setFormType('venda')" id="btnTypeVenda" class="flex-1 py-3 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all bg-white text-black">Antecipação</button>
-                <button onclick="setFormType('despesa')" id="btnTypeDespesa" class="flex-1 py-3 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all text-slate-500">Despesa</button>
+            <div class="flex p-1 bg-black rounded-xl mb-6 border border-white/5">
+                <button onclick="setFormType('venda')" id="btnTypeVenda" class="flex-1 py-3 rounded-lg text-[9px] font-black uppercase transition-all bg-white text-black">Venda</button>
+                <button onclick="setFormType('despesa')" id="btnTypeDespesa" class="flex-1 py-3 rounded-lg text-[9px] font-black uppercase transition-all text-slate-500">Gasto</button>
             </div>
 
             <form id="recordForm" class="space-y-4">
-                <div class="space-y-1">
-                    <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Descrição</label>
-                    <input id="fDescription" required class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white" placeholder="...">
-                </div>
+                <input id="fDescription" required class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold text-sm outline-none focus:border-white" placeholder="DESCRIÇÃO">
+                
                 <div id="vendaFields" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Vlr Máquina</label>
-                            <input id="fMachineValue" type="number" step="0.01" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white" placeholder="0,00">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Vlr Cliente</label>
-                            <input id="fClientValue" type="number" step="0.01" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white" placeholder="0,00">
-                        </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input id="fMachineValue" type="number" step="0.01" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold text-sm outline-none focus:border-white" placeholder="MÁQUINA R$">
+                        <input id="fClientValue" type="number" step="0.01" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold text-sm outline-none focus:border-white" placeholder="CLIENTE R$">
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Parcelamento</label>
-                        <select id="fPaymentMethod" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-black text-[10px] uppercase outline-none focus:border-white appearance-none"></select>
-                    </div>
+                    <select id="fPaymentMethod" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-black text-[10px] uppercase outline-none focus:border-white appearance-none"></select>
                 </div>
+
                 <div id="despesaFields" class="hidden">
-                    <div class="space-y-1">
-                        <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Valor Total</label>
-                        <input id="fAmount" type="number" step="0.01" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white" placeholder="0,00">
-                    </div>
+                    <input id="fAmount" type="number" step="0.01" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold text-sm outline-none focus:border-white" placeholder="VALOR TOTAL R$">
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[8px] font-black text-slate-500 uppercase tracking-widest ml-1">Data Competência</label>
-                    <input id="fDate" type="date" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white">
-                </div>
-                <div class="grid grid-cols-2 gap-4 pt-6">
-                    <button type="button" onclick="closeModal()" class="p-4 rounded-xl bg-black border border-neutral-800 hover:bg-neutral-800 text-white font-black uppercase tracking-widest text-[9px] transition-colors">Cancelar</button>
-                    <button type="submit" class="p-4 rounded-xl btn-primary font-black uppercase tracking-widest text-[9px] shadow-lg">Confirmar</button>
+
+                <input id="fDate" type="date" class="w-full p-4 rounded-xl border border-neutral-800 bg-black text-white font-bold outline-none focus:border-white">
+
+                <div class="grid grid-cols-2 gap-3 pt-4">
+                    <button type="button" onclick="closeModal()" class="p-4 rounded-xl bg-black border border-neutral-800 text-white font-black uppercase tracking-widest text-[9px]">Sair</button>
+                    <button type="submit" class="p-4 rounded-xl btn-primary font-black uppercase tracking-widest text-[9px]">Salvar</button>
                 </div>
             </form>
         </div>
@@ -208,7 +210,7 @@
 
     <script>
         let transactions = JSON.parse(localStorage.getItem('creditflow_data')) || [];
-        let profile = JSON.parse(localStorage.getItem('creditflow_profile')) || { name: 'Admin User', role: 'Diretor Financeiro', photo: '' };
+        let profile = JSON.parse(localStorage.getItem('creditflow_profile')) || { name: 'Admin', role: 'Diretor', photo: '' };
         let activeTab = 'dashboard';
         let currentType = 'venda';
         let lineChart, pieChart;
@@ -225,12 +227,13 @@
 
         function logout() { location.reload(); }
         function toggleProfile() { document.getElementById('profileMenu').classList.toggle('hidden'); }
+        
         function saveProfile() {
             profile.name = document.getElementById('userNameInput').value;
-            profile.role = document.getElementById('userRoleInput').value;
             localStorage.setItem('creditflow_profile', JSON.stringify(profile));
             updateProfileUI();
         }
+
         function updatePhoto(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -242,14 +245,12 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
         function updateProfileUI() {
-            document.getElementById('userNameDisplay').innerText = profile.name;
-            document.getElementById('userRoleDisplay').innerText = profile.role;
-            document.getElementById('userNameInput').value = profile.name;
-            document.getElementById('userRoleInput').value = profile.role;
             const photo = profile.photo || `https://ui-avatars.com/api/?name=${profile.name}&background=111&color=fff`;
             document.getElementById('userImg').src = photo;
             document.getElementById('userImgBig').src = photo;
+            document.getElementById('userNameInput').value = profile.name;
         }
 
         function formatCurrency(val) { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val); }
@@ -270,8 +271,19 @@
 
         window.changeTab = (tab) => {
             activeTab = tab;
+            
+            // UI Desktop
             document.querySelectorAll('.tab-btn').forEach(btn => btn.className = "tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase transition-all text-slate-500");
-            document.getElementById('tab-' + tab).className = "tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-black shadow-sm";
+            const dtBtn = document.getElementById('tab-' + tab + '-dt');
+            if(dtBtn) dtBtn.className = "tab-btn px-5 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-black shadow-sm";
+            
+            // UI Mobile
+            const mbTabs = ['dashboard', 'venda', 'despesa'];
+            mbTabs.forEach(t => {
+                const btn = document.getElementById('tab-' + t + '-mb');
+                if(btn) btn.className = (t === tab) ? "flex flex-col items-center gap-1 text-white tab-btn-active" : "flex flex-col items-center gap-1 text-slate-500";
+            });
+
             document.getElementById('chartsSection').classList.toggle('hidden', tab !== 'dashboard');
             render();
         };
@@ -280,12 +292,10 @@
             document.getElementById('dayFilter').value = '';
             document.getElementById('dateFilter').value = new Date().toISOString().substring(0, 7);
             render();
-        }
+        };
 
         function updateCharts(data) {
             const ctxLine = document.getElementById('lineChart').getContext('2d');
-            const ctxPie = document.getElementById('pieChart').getContext('2d');
-            
             const daily = {};
             data.forEach(t => { if(t.type === 'venda') { if(!daily[t.date]) daily[t.date] = 0; daily[t.date] += t.profit; } });
             const labels = Object.keys(daily).sort().slice(-7);
@@ -294,17 +304,19 @@
             if(lineChart) lineChart.destroy();
             lineChart = new Chart(ctxLine, {
                 type: 'line',
-                data: { labels, datasets: [{ data: points, borderColor: '#00ff41', backgroundColor: 'rgba(0, 255, 65, 0.05)', fill: true, tension: 0.3, borderWidth: 2, pointBackgroundColor: '#00ff41' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { color: '#222' }, ticks: { color: '#555', font: { size: 9, weight: 'bold' } } } } }
+                data: { labels, datasets: [{ data: points, borderColor: '#00ff41', backgroundColor: 'rgba(0, 255, 65, 0.1)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#00ff41' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#444', font: { size: 8, weight: 'bold' } } } } }
             });
 
+            // Pie chart apenas p/ desktop (escondido via CSS no mobile)
+            const ctxPie = document.getElementById('pieChart').getContext('2d');
             let tL = 0, tD = 0;
             data.forEach(t => { if(t.type === 'venda') tL += t.profit; else tD += t.amount; });
             if(pieChart) pieChart.destroy();
             pieChart = new Chart(ctxPie, {
                 type: 'doughnut',
-                data: { labels: ['LUCRO', 'GASTOS'], datasets: [{ data: [tL, tD], backgroundColor: ['#00ff41', '#333333'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#555', boxWidth: 8, font: { size: 9, weight: '900' }, padding: 20 } } }, cutout: '85%' }
+                data: { labels: ['LUCRO', 'GASTOS'], datasets: [{ data: [tL, tD], backgroundColor: ['#00ff41', '#222'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '80%' }
             });
         }
 
@@ -317,15 +329,8 @@
             let bruto = 0, lucro = 0, despesa = 0;
             const filtered = transactions.filter(t => {
                 const matchesTab = activeTab === 'dashboard' || t.type === activeTab;
+                let matchesTime = filterDay ? t.date === filterDay : (!filterMonth || t.date.substring(0, 7) === filterMonth);
                 
-                // Prioridade para o filtro de dia se estiver preenchido
-                let matchesTime = false;
-                if (filterDay) {
-                    matchesTime = t.date === filterDay;
-                } else {
-                    matchesTime = !filterMonth || t.date.substring(0, 7) === filterMonth;
-                }
-
                 if(matchesTime) {
                     if(t.type === 'venda') { bruto += t.grossAmount; lucro += t.profit; }
                     else { despesa += t.amount; }
@@ -344,32 +349,32 @@
                 const tr = document.createElement('tr');
                 tr.className = "text-[10px] hover:bg-neutral-800 transition-colors";
                 tr.innerHTML = `
-                    <td class="p-5 text-slate-500 font-bold uppercase tracking-widest">${t.date.split('-').reverse().join('/')}</td>
-                    <td class="p-5 font-black text-white uppercase tracking-tight">${t.description}</td>
-                    <td class="p-5"><span class="px-2 py-1 bg-black border border-neutral-800 text-slate-400 font-black">${t.type === 'venda' ? t.paymentMethod : 'DESPESA'}</span></td>
-                    <td class="p-5 text-right text-slate-500 tabular-nums">${formatCurrency(t.type === 'venda' ? t.grossAmount : t.amount)}</td>
-                    <td class="p-5 text-right font-black tabular-nums ${t.type === 'venda' ? 'text-profit' : 'text-slate-500'}">${t.type === 'venda' ? '+' : '-'}${formatCurrency(t.type === 'venda' ? t.profit : t.amount)}</td>
-                    <td class="p-5 text-center"><button onclick="deleteTransaction(${t.id})" class="text-slate-700 hover:text-white transition-colors">✕</button></td>
+                    <td class="p-4 text-slate-500 font-bold uppercase">${t.date.split('-').reverse().slice(0,2).join('/')}</td>
+                    <td class="p-4 font-black text-white uppercase">${t.description}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 bg-black border border-neutral-800 text-[8px] text-slate-400 font-black">${t.type === 'venda' ? t.paymentMethod : 'GASTO'}</span></td>
+                    <td class="p-4 text-right text-slate-500 tabular-nums">${formatCurrency(t.type === 'venda' ? t.grossAmount : t.amount)}</td>
+                    <td class="p-4 text-right font-black tabular-nums ${t.type === 'venda' ? 'text-profit' : 'text-slate-500'}">${t.type === 'venda' ? '+' : '-'}${formatCurrency(t.type === 'venda' ? t.profit : t.amount)}</td>
+                    <td class="p-4 text-center"><button onclick="deleteTransaction(${t.id})" class="text-slate-700 hover:text-white">✕</button></td>
                 `;
                 list.appendChild(tr);
             });
         }
 
-        window.deleteTransaction = (id) => { if(confirm('Excluir registro?')) { transactions = transactions.filter(t => t.id !== id); saveAndRender(); } };
+        window.deleteTransaction = (id) => { if(confirm('Excluir?')) { transactions = transactions.filter(t => t.id !== id); saveAndRender(); } };
         function saveAndRender() { localStorage.setItem('creditflow_data', JSON.stringify(transactions)); render(); }
 
         document.getElementById('recordForm').onsubmit = (e) => {
             e.preventDefault();
             const data = { id: Date.now(), type: currentType, description: document.getElementById('fDescription').value, date: document.getElementById('fDate').value };
             if (currentType === 'venda') {
-                const m = parseFloat(document.getElementById('fMachineValue').value);
-                const c = parseFloat(document.getElementById('fClientValue').value);
+                const m = parseFloat(document.getElementById('fMachineValue').value) || 0;
+                const c = parseFloat(document.getElementById('fClientValue').value) || 0;
                 const r = CARD_RATES[document.getElementById('fPaymentMethod').value];
                 data.grossAmount = m;
                 data.profit = (m * (1 - r/100)) - c;
                 data.paymentMethod = document.getElementById('fPaymentMethod').value;
             } else {
-                data.amount = parseFloat(document.getElementById('fAmount').value);
+                data.amount = parseFloat(document.getElementById('fAmount').value) || 0;
             }
             transactions.push(data);
             transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -380,8 +385,7 @@
         function init() {
             const sel = document.getElementById('fPaymentMethod');
             sel.innerHTML = '<option value="DEBITO">DÉBITO (1.69%)</option>';
-            const order = ['1X', '2X', '3X', '4X', '5X', '6X', '7X', '8X', '9X', '10X', '11X', '12X', '13X', '14X', '15X', '16X', '17X', '18X'];
-            order.forEach(k => {
+            ['1X','2X','3X','4X','5X','6X','7X','8X','9X','10X','11X','12X','18X'].forEach(k => {
                 const opt = document.createElement('option');
                 opt.value = k; opt.innerText = `${k} CRÉDITO (${CARD_RATES[k].toFixed(2)}%)`;
                 sel.appendChild(opt);
